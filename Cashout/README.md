@@ -127,5 +127,4 @@ https://github.com/prakashse7en/SystemDesign/blob/main/Cashout/swagger/autofundo
 Using existing synchronous call vs event driven design -> event driven design is better and its not blocking in nature .
 Agreed to use event driven design as it is non blocking compared to blocking synchronous calls
 
-## Future Enhancements
-Include frequency Monthly to handle  leap year /non leap year dates
+
