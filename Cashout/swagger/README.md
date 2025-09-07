@@ -113,7 +113,6 @@ https://github.com/prakashse7en/SystemDesign/blob/main/Cashout/swagger/autofundo
 ### 6. Business Logic :
 * Only one configuration per business
 * Disabled configurations stored but not executed
-* Next execution calculated based on frequency and current time
 
 ## Performance Benchmarks
 | Endpoint | Expected Response Time | Max Acceptable |
@@ -128,3 +127,5 @@ https://github.com/prakashse7en/SystemDesign/blob/main/Cashout/swagger/autofundo
 Using existing synchronous call vs event driven design -> event driven design is better and its not blocking in nature .
 Agreed to use event driven design as it is non blocking compared to blocking synchronous calls
 
+## Future Enhancements
+Include frequency Monthly to handle  leap year /non leap year dates
