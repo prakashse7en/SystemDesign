@@ -55,8 +55,8 @@ Table name - Orgn_cust_auto_fund_out
 
 | Column Details |
 |----------------|
-| **Column Name:** Orgn_cust_auto_fund_out_id<br>**Data type:** uuid |
-| **Column Name:** Orgn_cust_merch_id<br>**Data type:** uuid |
+| **Column Name:** Orgn_cust_auto_fund_out_id<br>**Data type:** binary |
+| **Column Name:** Orgn_cust_merch_id<br>**Data type:** binary |
 | **Column Name:** Freq_type<br>**Data type:** varchar(10) |
 | **Column Name:** isEnabled<br>**Data type:** byte |
 | **Column Name:** day<br>**Data type:** tinyint |
