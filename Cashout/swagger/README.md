@@ -1,4 +1,4 @@
-#Auto Fund Out Feature
+# Auto Fund Out Feature
 
 **Feature:** Auto Fund out  
 **System:** Payme for business  
@@ -32,8 +32,74 @@ We can use event driven design rather than synchronous calls to support auto fun
 
 ### Frequency Types: Hourly, Weekly, Daily
 
-| Frequency Type | Attributes | Comments |
-|----------------|------------|----------|
-| **Hourly** | freqType: "H"<br>Hour(0-23) - default 10pm<br>minimumBalance: default 0 | Day is not required here |
-| **Weekly** | freqType: "W"<br>Day(0-6) - default 6<br>Hour(0-23) - default 10pm<br>minimumBalance: default 0 |  |
-| **Daily** | freqType: "D"<br>Hour(0-23) - default 10pm<br>minimumBalance: default 0 | Day is not required here |
+| Frequency Type | Attributes                                                              | Comments |
+|----------------|-------------------------------------------------------------------------|-------------
+| **Hourly**     | freqType: "H"<br>Hour(0-23) - default 10pm<br>minimumBalance: default 0 | Day is not required here |
+| **Weekly**     | freqType: "W"<br>Day(0-6) - default 6<br>Hour(0-23) - default 10pm<br>  |                          |
+|                   minimumBalance: default 0                                              |                          |
+| **Daily**      | freqType: "D"<br>Hour(0-23) - default 10pm<br>minimumBalance: default 0 | Day is not required here |
+
+## Existing logic 
+<img width="391" height="471" alt="image" src="https://github.com/user-attachments/assets/b63b5e15-b462-40de-a2fd-0fdccbfde34c" />
+1 and 2 User fetches IDToken from Azure ADB2C and gets Operation token after verifying the pin [ operation token valid for one operation ] . 
+3 and 4 Cashout is triggered which internally calls ledger to do the money movement
+5 Based on ledger status for cashout operation success or failure notifications are sent . Status of Uncompleted cashout will be known during reconciliation and corresponding notifications are sent  accordingly.
+
+## AUTO Fund out logic
+<img width="509" height="191" alt="image" src="https://github.com/user-attachments/assets/eac67ed0-2ba6-4197-84f3-38ae52e93b3b" />
+Auto Fund Out creation /read and update
+1.Get ADB2C IDToken and set /view/update auto fundout . Corresponding auto fundout details to be persisted  in below table 
+
+Table name - Orgn_cust_auto_fund_out
+
+| Column Details |
+|----------------|
+| **Column Name:** Orgn_cust_auto_fund_out_id<br>**Data type:** uuid |
+| **Column Name:** Orgn_cust_merch_id<br>**Data type:** uuid |
+| **Column Name:** Freq_type<br>**Data type:** varchar(10) |
+| **Column Name:** isEnabled<br>**Data type:** byte |
+| **Column Name:** day<br>**Data type:** tinyint |
+| **Column Name:** hour<br>**Data type:** tinyint |
+| **Column Name:** minimum_bal<br>**Data type:** decimal(10,3) |
+
+## Auto FundOut Batch triggered
+
+<img width="639" height="661" alt="image" src="https://github.com/user-attachments/assets/b54c2b13-37f0-4302-8155-2b8468b9b371" />
+
+1.1.1 cron job configured in scheduler microservices to run hourly auto fundout job 
+1.1.2 Invokes Business profile microservices to pick if any active auto fundout present at this time . If yes then send an event to Auto fundout event producer
+1.2.1 and 1.2.2 Auto fundout event consumer consumes the event in payment transaction ms and performs cashout invoking ledger 
+1.2.3 Based on ledger status for cashout operation success or failure notifications events are sent . Status of Uncompleted cashout will be known during reconciliation and corresponding notifications are sent  as events to merchant_email_notification_event producer accordingly.
+1.3.1 merchant_email_notification_event consumer consumes the event in notification ms and sends the email notification and audit of this notification is persisted into table
+
+## Swagger 
+https://github.com/prakashse7en/SystemDesign/blob/main/Cashout/swagger/autofundout.yaml
+
+| Endpoint                                             | Method | Description |
+|------------------------------------------------------|--------|-------------|
+| /business-profiles/business/{businessId}/autofundout | POST | Create auto fundout configuration |
+| /business-profiles/business/{businessId}/autofundout | GET | Get auto fundout configuration |
+| /business-profiles/business/{businessId}/autofundout | PUT | Update auto fundout configuration |
+| /business/autofundout                                | POST | Trigger batch processing |
+
+
+## Business Rules & Validations
+
+### 1. Frequency Type Rules:
+* **H (Hourly):** Executes every hour at specified minute (typically :00)
+* **D (Daily):** Executes every day at specified hour
+* **W (Weekly):** Executes on specified day of week at specified hour
+
+### 2. Day Field Requirements:
+* **Hourly:** Day field not required
+* **Daily:** Day field not required
+* **Weekly:** Day field required (0-6, where 0=Sunday, 6=Saturday)
+
+### 3. Default Values:
+* **Hour:** 22 (10:00 PM) if not specified
+* **Day:** 6 (Saturday) for weekly frequency
+
+## Queries and Decision
+Using existing synchronous call vs event driven design -> event driven design is better and its not blocking in nature .
+Agreed to use event driven design as it is non blocking compared to blocking synchronous calls
+
