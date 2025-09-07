@@ -63,7 +63,7 @@ Table name - Orgn_cust_auto_fund_out
 | **Column Name:** hour<br>**Data type:** tinyint |
 | **Column Name:** minimum_bal<br>**Data type:** decimal(10,3) |
 
-## Auto FundOut Batch triggered
+## Auto FundOut Batch job
 
 <img width="639" height="661" alt="image" src="https://github.com/user-attachments/assets/b54c2b13-37f0-4302-8155-2b8468b9b371" />
 
