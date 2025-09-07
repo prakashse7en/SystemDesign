@@ -26,7 +26,7 @@ We can use event driven design rather than synchronous calls to support auto fun
 
 * **Security** - Authentication and Authorization (RBAC) flow to initialized as scheduled job. Use existing Internal JWT token(role is internal) to trigger auto fund out job
 * **Scalability** - Since it is event driven design there shall be spike at times when traffic is high. Indexing to be in place for queries to be added. There shall be spike at certain times ensure correct set of partitions present for event hubs.
-* **Monitoring and observability** - Dashboards to be created to monitor auto fund out performance. Proper Alerting to be created and report Incident management team via x-matters in case of any issues.
+* **Monitoring Alerting and observability** - Dashboards to be created to monitor auto fund out performance. Proper Alerting to be created and raise alerts incase of any issues during the auto fundout flow
 
 ## Design Deep dive
 
@@ -99,6 +99,30 @@ https://github.com/prakashse7en/SystemDesign/blob/main/Cashout/swagger/autofundo
 ### 3. Default Values:
 * **Hour:** 22 (10:00 PM) if not specified
 * **Day:** 6 (Saturday) for weekly frequency
+
+### 4. Default Values:
+* **Minimum Balance:** 0 if not specified
+* **Enabled Status:** false by default
+
+### 5. Validation Rules:
+* **Hour Validation:** Must be in 24-hour format (00-23)
+* **Day Validation:** 0-6 for weekly, ignored for daily/hourly
+* **Balance Validation:** Must be >= 0
+* **Frequency Validation:** Only H, D, W allowed
+
+### 6. Business Logic :
+* Only one configuration per business
+* Disabled configurations stored but not executed
+* Next execution calculated based on frequency and current time
+
+## Performance Benchmarks
+| Endpoint | Expected Response Time | Max Acceptable |
+|----------|----------------------|----------------|
+| POST /autofundout | < 100ms | < 500ms |
+| GET /autofundout | < 100ms | < 300ms |
+| PUT /autofundout | < 100ms | < 500ms |
+| POST /business/autofundout (batch) | < 100ms | < 200ms |
+
 
 ## Queries and Decision
 Using existing synchronous call vs event driven design -> event driven design is better and its not blocking in nature .
