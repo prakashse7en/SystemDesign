@@ -1,0 +1,415 @@
+openapi: 3.0.3
+info:
+  title: Auto Fundout API
+  version: 1.0.0
+  description: API for managing automated fund transfer configurations for business accounts
+  contact:
+    name: Digital Banking Platform Team
+    email: platform@abc.com
+  license:
+    name: abc Proprietary
+servers:
+  - url: https://api-sit.com/on-boarding
+    description: SIT Environment
+  - url: http://localhost:8082
+    description: Local Development
+  - url: http://localhost:8092
+    description: Batch Service Local
+
+paths:
+  /business-profiles/business/{businessId}/autofundout:
+    post:
+      summary: Create Auto Fundout Configuration
+      description: Creates a new automated fund transfer configuration for a business subunit
+      tags:
+        - Auto Fundout
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          description: Unique business identifier
+          schema:
+            type: string
+            format: uuid
+            example: "9f3350e4-1efa-4022-8e19-c87f8b04cb71"
+        - $ref: '#/components/parameters/CountryCode'
+        - $ref: '#/components/parameters/GroupMember'
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/DeviceType'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/DeviceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutoFundoutRequest'
+            example:
+              freqType: "W"
+              day: "6"
+              hour: "09"
+              minimumBalance: 500
+              enabled: false
+      responses:
+        '201':
+          description: Auto fundout configuration created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoFundoutResponse'
+        '400':
+          description: Bad request - Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Business or subunit not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Auto fundout configuration already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - BearerAuth: []
+
+    get:
+      summary: Get Auto Fundout Configuration
+      description: Retrieves the current automated fund transfer configuration for a business subunit
+      tags:
+        - Auto Fundout
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          description: Unique business identifier
+          schema:
+            type: string
+            format: uuid
+            example: "9f3350e4-1efa-4022-8e19-c87f8b04cb71"
+        - name: subunitId
+          in: path
+          required: true
+          description: Unique business subunit identifier
+          schema:
+            type: string
+            format: uuid
+            example: "9f3350e4-1efa-4022-8e19-c87f8b04cb71"
+        - $ref: '#/components/parameters/CountryCode'
+        - $ref: '#/components/parameters/GroupMember'
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/DeviceType'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/DeviceId'
+      responses:
+        '200':
+          description: Auto fundout configuration retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoFundoutResponse'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Auto fundout configuration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - BearerAuth: []
+
+    put:
+      summary: Update Auto Fundout Configuration
+      description: Updates an existing automated fund transfer configuration for a business subunit
+      tags:
+        - Auto Fundout
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          description: Unique business identifier
+          schema:
+            type: string
+            format: uuid
+            example: "9f3350e4-1efa-4022-8e19-c87f8b04cb71"
+        - name: subunitId
+          in: path
+          required: true
+          description: Unique business subunit identifier
+          schema:
+            type: string
+            format: uuid
+            example: "9f3350e4-1efa-4022-8e19-c87f8b04cb71"
+        - $ref: '#/components/parameters/CountryCode'
+        - $ref: '#/components/parameters/GroupMember'
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/DeviceType'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/DeviceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutoFundoutRequest'
+            example:
+              freqType: "W"
+              day: "0"
+              hour: "09"
+              minimumBalance: 0
+              enabled: true
+      responses:
+        '200':
+          description: Auto fundout configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoFundoutResponse'
+        '400':
+          description: Bad request - Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Auto fundout configuration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - BearerAuth: []
+
+  /business/autofundout:
+    post:
+      summary: Process Auto Fundout Batch
+      description: Triggers batch processing of automated fund transfers for all configured businesses
+      tags:
+        - Auto Fundout Batch
+      parameters:
+        - $ref: '#/components/parameters/CountryCode'
+        - $ref: '#/components/parameters/GroupMember'
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/DeviceType'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/DeviceId'
+      responses:
+        '202':
+          description: Batch processing initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchProcessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - BearerAuth: []
+
+components:
+  schemas:
+    AutoFundoutRequest:
+      type: object
+      required:
+        - freqType
+        - day
+        - hour
+        - minimumBalance
+        - enabled
+      properties:
+        freqType:
+          type: string
+          enum: [D, W, M]
+          description: Frequency type - Daily (D), Weekly (W), Monthly (M)
+          example: "W"
+        day:
+          type: string
+          description: |
+            Day specification based on frequency type:
+            - For Daily (D): Not used, can be empty
+            - For Weekly (W): Day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
+            - For Monthly (M): Day of month (1-31)
+          example: "6"
+        hour:
+          type: string
+          pattern: "^(0[0-9]|1[0-9]|2[0-3])$"
+          description: Hour of execution in 24-hour format (00-23)
+          example: "09"
+        minimumBalance:
+          type: number
+          minimum: 0
+          description: Minimum account balance required before triggering auto fundout
+          example: 500
+        enabled:
+          type: boolean
+          description: Whether the auto fundout configuration is active
+          example: false
+
+    AutoFundoutResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the auto fundout configuration
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        businessId:
+          type: string
+          format: uuid
+          description: Business identifier
+          example: "9f3350e4-1efa-4022-8e19-c87f8b04cb71"
+        freqType:
+          type: string
+          enum: [D, W, M]
+          description: Frequency type
+          example: "W"
+        day:
+          type: string
+          description: Day specification
+          example: "6"
+        hour:
+          type: string
+          description: Hour of execution
+          example: "09"
+        minimumBalance:
+          type: number
+          description: Minimum balance threshold
+          example: 500
+        enabled:
+          type: boolean
+          description: Configuration status
+          example: false
+
+
+    BatchProcessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Status message
+          example: "Auto fundout batch processing initiated successfully"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Human readable error message
+        code:
+          type: string
+          description: Error code for programmatic handling
+        correlationId:
+          type: string
+          description: Request correlation ID for tracking
+  
+  parameters:
+    CountryCode:
+      name: X-Chnl-CountryCode
+      in: header
+      required: true
+      description: Country code for the channel
+      schema:
+        type: string
+        example: "HK"
+    
+    GroupMember:
+      name: X-Chnl-Group-Member
+      in: header
+      required: true
+      description: abc group member identifier
+      schema:
+        type: string
+        example: "123"
+    
+    Locale:
+      name: X-locale
+      in: header
+      required: false
+      description: Locale for response localization
+      schema:
+        type: string
+        example: "zh-Hans-HK"
+    
+    DeviceType:
+      name: X-DeviceType
+      in: header
+      required: true
+      description: Type of device making the request
+      schema:
+        type: string
+        example: "deviceType"
+    
+    CorrelationId:
+      name: X-Request-Correlation-Id
+      in: header
+      required: true
+      description: Unique identifier for request correlation and tracking
+      schema:
+        type: string
+        example: "correlationId"
+    
+    DeviceId:
+      name: X-Device-Id
+      in: header
+      required: true
+      description: Unique device identifier
+      schema:
+        type: string
+        example: "deviceId"
+
+
+
+tags:
+  - name: Auto Fundout
+    description: Operations for managing automated fund transfer configurations
+  - name: Auto Fundout Batch
+    description: Operations for batch processing of automated fund transfers
