@@ -1,7 +1,7 @@
 # Auto Fund Out Feature
 
 **Feature:** Auto Fund out  
-**System:** Fintech App 
+**System:** Fintech  Merchant App
 **Stake holder:** Business Analyst  
 **Version:** V1.0  
 **Approval:** Senior Solution Architect  
