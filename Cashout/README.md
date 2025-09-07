@@ -20,7 +20,8 @@ Existing system merchant can do manual cashout feature as most of the merchant d
 
 Existing manual cashout api calls is ~<2 TPS as merchant don't do cashout every day.  
 As per current situation total number of merchant - 40000. Worst case 40000 merchants choose to have same frequency and trigger cashout.  
-We can use event driven design rather than synchronous calls to support auto fund due to systems growing nature of merchants. Event hubs partitions to be increased to handle high traffic (number of partiotions to be defined based on load test)
+We can use event driven design rather than synchronous calls to support auto fund due to systems growing nature of merchants. Event hubs partitions to be increased to handle high traffic (number of partiotions to be defined based on load test)  
+
 **Recommended Partitions: 12(K8 pod => min replica 6 max replica 12)**
 * 1 partition per max replica (1:1 ratio)
 * Each consumer instance handles 1 partition
